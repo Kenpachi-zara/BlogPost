@@ -1,0 +1,66 @@
+@model BlogPost.Models.ViewModels.PostCreateViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+<h4>Post</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Post.Title" class="control-label"></label>
+                <input asp-for="Post.Title" class="form-control" />
+                <span asp-validation-for="Post.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Post.Content" class="control-label"></label>
+                <input asp-for="Post.Content" class="form-control" />
+                <span asp-validation-for="Post.Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Post.ThumbnailImagePath" class="control-label"></label>
+                <input asp-for="Post.ThumbnailImagePath" class="form-control" />
+                <span asp-validation-for="Post.ThumbnailImagePath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <table>
+                    <thead>
+                    <tr>
+                     <th>Name</th>
+                   </tr>
+                    </thead>
+                    <tbody>
+                        @for (var i = 0; i < Model.Topics.Count; i++)
+                            {
+
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" asp-for="@Model.Topics[i].IsChecked"  />
+                                        <label asp-for="@Model.Topics[i].IsChecked">@Model.Topics[i].Name</label>
+                                        <input type="hidden" asp-for="@Model.Topics[i].Name" />
+                                        <input type="hidden" asp-for="@Model.Topics[i].ItemId" />
+                                    </td>
+                                </tr>
+                            }
+                            <span asp-validation-for="Topics" class="text-danger"></span>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="Related">Back to List</a>
+</div>
+</body>
+</html>

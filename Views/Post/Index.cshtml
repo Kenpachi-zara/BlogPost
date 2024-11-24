@@ -1,0 +1,94 @@
+@model BlogPost.ViewsModels.PostIndexViewModel;
+@using X.PagedList.Mvc.Core;
+@using BlogPost.PostRequests;
+
+<link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+@using (Html.BeginForm("Index", "Post", FormMethod.Get))
+{
+    <p>
+        Find by Title: @Html.TextBox("Title")  
+        <input type="submit" value="Title" /></p>
+    <p>
+        Filter by Author: @Html.TextBox("Author")  
+        <input type="submit" value="Author" /></p>
+    <p>
+        Filter by Topic: @Html.TextBox("Topic")  
+        <input type="submit" value="Topic" /></p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).Content)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).ThumbnailImagePath)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).ModifiedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).CreationDate)
+                <a 
+                 asp-controller="Post"
+                 asp-action="Index"
+                 asp-route-SortBy="@Model.SortBy"
+                 asp-route-Author="@Model.Author"
+                 asp-route-Title="@Model.Title"
+                 asp-route-Page="@Model.Items.PageNumber.ToString()"
+                 asp-route-Topic="@Model.Topic"
+                 >Sort</a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Items) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ThumbnailImagePath)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModifiedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreationDate)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+    <br /> 
+    Page @(Model.Items.PageCount < Model.Items.PageNumber ? 0 : Model.Items.PageNumber) of @Model.Items.PageCount
+    @Html.PagedListPager(Model.Items, page => Url.Action("Index", new PostPageRequest(Model.Title, Model.Author, Model.Topic,page, Model.SortBy, true)), 
+    new PagedListRenderOptions {
+        LiElementClasses = new string[] { "page-item" },
+        PageClasses = new string[] { "page-link" } })
+</body>
+</html>
