@@ -1,0 +1,33 @@
+/* Container holding the image and the text */
+.image-div-container {
+    position: relative;
+    text-align: center;
+    color: white;
+  }
+
+  /* Centered text */
+.image-text-centered {
+    position: absolute;
+    top: 13%;
+    left: 50%;
+    font-size: xxx-large;
+    font-weight: 700;
+    transform: translate(-50%, -50%);
+    font-family: none;
+    font-style: italic;
+  }
+
+.div-text-break{
+  word-break: break-all !important;
+}
+
+.meta-data-text{
+    font-size: x-small;
+    font-weight: 700;
+    color: darkgrey;
+}
+
+.darken-image{
+  filter: brightness(50%);
+  opacity: 86%;
+}
