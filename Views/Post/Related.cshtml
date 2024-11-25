@@ -1,5 +1,7 @@
 @model IEnumerable<BlogPost.DTOs.PostViewDto>
 
+<link href="~/css/post-css.css" rel="stylesheet" type="text/css" />
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,48 +15,24 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ThumbnailImagePath)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModifiedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreationDate)
-            </th>
+            <th></th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ThumbnailImagePath)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModifiedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationDate)
-            </td>
+           <tr>
+                    <td>
+                        <span class="meta-data-text">Author: You</span>
+                        <span style="float:right; margin-top: 3px;" class="meta-data-text">Creation Date: @Html.DisplayFor(modelItem => item.CreationDate)   Modified Date:  @Html.DisplayFor(modelItem => item.ModifiedDate) </span>
+                        <div class="image-div-container">
+                            <img style="max-height: 400px;" src="~/images/@item.ThumbnailImagePath" class="rounded img-fluid darken-image" alt="Responsive image">
+                            <div class="image-text-centered">@Html.DisplayFor(modelItem => item.Title)</div>
+                        </div>
+                        <div class="div-text-break lead mt-5">@Html.Raw(item.Content)</div>
+                    </td>
+                </tr>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.PostId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.PostId">Details</a> |

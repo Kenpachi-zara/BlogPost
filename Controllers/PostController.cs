@@ -14,7 +14,7 @@ using BlogPost.Exceptions;
 
 namespace BlogPost.Controllers
 {
-    //[Authorize(Roles = "Post")]
+    [Authorize(Roles = "Post")]
     public class PostController : Controller
     {
         private readonly IMapper _mapper;
@@ -27,9 +27,9 @@ namespace BlogPost.Controllers
             _postService = postService;
             _logger = logger;
         }
-        
-         //[AllowAnonymous]
-         public IActionResult Index(PostPageRequest pageRequest)
+
+        [AllowAnonymous]
+        public IActionResult Index(PostPageRequest pageRequest)
         {
             IQueryable<Post>? posts = _postService.FindAllByPageRequest(pageRequest);
             PostIndexViewModel viewModel = MapViewModel(pageRequest, posts);
@@ -43,14 +43,13 @@ namespace BlogPost.Controllers
             var currentUserName = User.FindFirstValue(ClaimTypes.Name);
             if (currentUserName == null) return BadRequest("Claims do not contain UserName");
             IEnumerable<Post> posts = await _postService.FindAllByUserName(currentUserName);
-            var result = _mapper.Map<IEnumerable<PostViewDto>>(posts);
-            return View(result);
+            return View( _mapper.Map<IEnumerable<PostViewDto>>(posts));
         }
 
         // GET: Post/Details?id=
         public async Task<IActionResult> Details(Guid? id)
         {
-             _logger.LogInformation("Handling details request for post {DT}", DateTime.UtcNow.ToLongTimeString());
+            _logger.LogInformation("Handling details request for post {DT}", DateTime.UtcNow.ToLongTimeString());
             var post = await _postService.FindById(id);
             if (post == null) return NotFound();
             return View(post);
@@ -69,20 +68,23 @@ namespace BlogPost.Controllers
         // POST: Post/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind] PostCreateRequest postCreateRequest)
+        public async Task<IActionResult> Create(PostCreateRequest postCreateRequest, IFormFile? ImageFile)
         {
             _logger.LogInformation("Handle Request to create post {DT}", DateTime.UtcNow.ToLongTimeString());
-            var postCreateViewModel = _mapper.Map<PostCreateViewModel>(postCreateRequest);
-            Post post = _mapper.Map<Post>(postCreateViewModel.Post);
-            post.Author = User.FindFirstValue(ClaimTypes.Name);        
-            try {
-              await _postService.CreatePost(post, postCreateViewModel.Topics); // unrealistic warning, validated for nullability
-            } catch (RequestFieldInvalidException requestFieldInvalidException){
-                  foreach (KeyValuePair<string, string> error in requestFieldInvalidException.FieldErrors)
-                        ModelState.AddModelError(error.Key, error.Value);
+            if (postCreateRequest.Post is null) return BadRequest("Must set Post data in request");
+            Post post = MapPost(postCreateRequest);
+            postCreateRequest.Post.ImageFile = ImageFile;
+            try
+            {
+                await _postService.CreatePost(post, postCreateRequest); // unrealistic warning, validated for nullability
+            }
+            catch (RequestFieldInvalidException requestFieldInvalidException)
+            {
+                foreach (KeyValuePair<string, string> error in requestFieldInvalidException.FieldErrors)
+                    ModelState.AddModelError(error.Key, error.Value);
             }
             if (ModelState.IsValid) return RedirectToAction(nameof(Related));
-            return View(postCreateViewModel);
+            return View(_mapper.Map<PostCreateViewModel>(postCreateRequest));
         }
 
         // GET: Post/Edit?id=
@@ -101,21 +103,27 @@ namespace BlogPost.Controllers
         // POST: Post/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind] PostEditRequest postEditRequest)
+        public async Task<IActionResult> Edit([Bind] PostEditRequest postEditRequest, IFormFile? ImageFile)
         {
             _logger.LogInformation("Handling request to edit post {DT}", DateTime.UtcNow.ToLongTimeString());
-            var postEditViewModel = _mapper.Map<PostEditViewModel>(postEditRequest);
-            try{
-               await _postService.UpdatePost(postEditViewModel.Topics, Guid.Parse(postEditViewModel.Post.PostId));
-            }catch (NotFoundException notFoundException){
-                  return NotFound(notFoundException.Message);
-            }catch (RequestFieldInvalidException requestFieldInvalidException){
-                 foreach (KeyValuePair<string, string> error in requestFieldInvalidException.FieldErrors)
-                        ModelState.AddModelError(error.Key, error.Value);
+            if (postEditRequest.Post is null) return BadRequest("Must set Post data in request");
+            postEditRequest.Post.ImageFile = ImageFile;
+            try
+            {
+                await _postService.UpdatePost(postEditRequest);
+            }
+            catch (NotFoundException notFoundException)
+            {
+                return NotFound(notFoundException.Message);
+            }
+            catch (RequestFieldInvalidException requestFieldInvalidException)
+            {
+                foreach (KeyValuePair<string, string> error in requestFieldInvalidException.FieldErrors)
+                    ModelState.AddModelError(error.Key, error.Value);
             }
             if (ModelState.IsValid)
                 return RedirectToAction(nameof(Related));
-            return View(postEditViewModel);
+            return View(_mapper.Map<PostEditViewModel>(postEditRequest));
         }
 
         // GET: Post/Delete?id=
@@ -135,6 +143,13 @@ namespace BlogPost.Controllers
             _logger.LogInformation("Handling delete request for post {DT}", DateTime.UtcNow.ToLongTimeString());
             await _postService.DeleteById(id);
             return RedirectToAction(nameof(Related));
+        }
+
+        private Post MapPost(PostCreateRequest postCreateRequest)
+        {
+            Post post = _mapper.Map<Post>(postCreateRequest.Post);
+            post.Author = User.FindFirstValue(ClaimTypes.Name);
+            return post;
         }
 
         private PostIndexViewModel MapViewModel(PostPageRequest pageRequest, IQueryable<Post> posts)

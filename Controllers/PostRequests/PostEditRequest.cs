@@ -11,5 +11,6 @@ namespace BlogPost.PostRequests{
      public string? Title {get; set;} 
      public string? Content {get; set;} 
      public string? ThumbnailImagePath {get; set;} 
+     public IFormFile? ImageFile {get; set;} 
     }
 }

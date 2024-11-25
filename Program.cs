@@ -48,9 +48,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//app.UseAuthentication();
-//app.UseAuthorization();
-//app.MapIdentityApi<BlogPostUser>();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapIdentityApi<BlogPostUser>();
 
 app.MapStaticAssets();
 app.MapControllerRoute(  //alawys need to add default, or return -> not found on all endpoint, check why

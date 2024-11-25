@@ -2,47 +2,48 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Edit</title>
 </head>
+
 <body>
 
-<h4>Post</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Post.PostId" />
-            <div class="form-group">
-                <label asp-for="Post.Title" class="control-label"></label>
-                <input asp-for="Post.Title" class="form-control" />
-                <span asp-validation-for="Post.Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Post.Content" class="control-label"></label>
-                <input asp-for="Post.Content" class="form-control" />
-                <span asp-validation-for="Post.Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Post.ThumbnailImagePath" class="control-label"></label>
-                <input asp-for="Post.ThumbnailImagePath" class="form-control" />
-                <span asp-validation-for="Post.ThumbnailImagePath" class="text-danger"></span>
-            </div>
+    <h4>Post</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Post.PostId" />
+                <div class="form-group my-2">
+                    <label asp-for="Post.Title" class="control-label"></label>
+                    <input asp-for="Post.Title" class="form-control" />
+                    <span asp-validation-for="Post.Title" class="text-danger"></span>
+                </div>
+                <div class="form-group my-2">
+                    <label asp-for="Post.Content" class="control-label"></label>
+                    <textarea asp-for="Post.Content" class="form-control" rows="15"></textarea>
+                    <span asp-validation-for="Post.Content" class="text-danger"></span>
+                </div>
+                <div class="form-group my-3">
+                    <input name="ImageFile" type="file" class="form-control">
+                    <span asp-validation-for="Post.ThumbnailImagePath" class="text-danger"></span>
+                </div>
                 <div class="form-group">
-                <table>
-                    <thead>
-                    <tr>
-                     <th>Name</th>
-                   </tr>
-                    </thead>
-                    <tbody>
-                        @for (var i = 0; i < Model.Topics.Count; i++)
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Assign Topic</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < Model.Topics.Count; i++)
                             {
                                 <tr>
                                     <td>
-                                        <input type="checkbox" asp-for="@Model.Topics[i].IsChecked"  />
+                                        <input type="checkbox" asp-for="@Model.Topics[i].IsChecked" />
                                         <label asp-for="@Model.Topics[i].IsChecked">@Model.Topics[i].Name</label>
                                         <input type="hidden" asp-for="@Model.Topics[i].Name" />
                                         <input type="hidden" asp-for="@Model.Topics[i].ItemId" />
@@ -50,19 +51,16 @@
                                 </tr>
                             }
                             <span asp-validation-for="Topics" class="text-danger"></span>
-                    </tbody>
-                </table>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group my-3">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a class="mx-2" asp-action="Related">Back to List</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Related">Back to List</a>
-</div>
-
 </body>
+
 </html>

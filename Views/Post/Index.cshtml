@@ -3,92 +3,80 @@
 @using BlogPost.PostRequests;
 
 <link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
+<link href="~/css/post-css.css" rel="stylesheet" type="text/css" />
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
 </head>
+
 <body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-@using (Html.BeginForm("Index", "Post", FormMethod.Get))
-{
-    <p>
-        Find by Title: @Html.TextBox("Title")  
-        <input type="submit" value="Title" /></p>
-    <p>
-        Filter by Author: @Html.TextBox("Author")  
-        <input type="submit" value="Author" /></p>
-    <p>
-        Filter by Topic: @Html.TextBox("Topic")  
-        <input type="submit" value="Topic" /></p>
-}
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).ThumbnailImagePath)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).Author)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).ModifiedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Items.FirstOrDefault((exp) => exp != null, new BlogPost.DTOs.PostViewDto()).CreationDate)
-                <a 
-                 asp-controller="Post"
-                 asp-action="Index"
-                 asp-route-SortBy="@Model.SortBy"
-                 asp-route-Author="@Model.Author"
-                 asp-route-Title="@Model.Title"
-                 asp-route-Page="@Model.Items.PageNumber.ToString()"
-                 asp-route-Topic="@Model.Topic"
-                 >Sort</a>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Items) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ThumbnailImagePath)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModifiedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationDate)
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-    <br /> 
+    @using (Html.BeginForm("Index", "Post", FormMethod.Get))
+    {
+        <p>
+            <span style="float: right;">
+                <input asp-for="@Model.Author" type="text" class="form-control" placeholder="Author" aria-label="Author"
+                    aria-describedby="basic-addon2">
+            </span>
+            <span style="float: right;" class="mx-3">
+                <input asp-for="@Model.Topic" type="text" class="form-control" placeholder="Topic" aria-label="Topic"
+                    aria-describedby="basic-addon2">
+            </span>
+        </p>
+        <div class="input-group" style="width: 30%;">
+            <input asp-for="@Model.Title" type="text" class="form-control" placeholder="Find by Title"
+                aria-label="Find by Title" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </div>
+        <input type="submit" value="Filter" class="btn btn-primary my-2" style="float: right;" />
+    }
+    <br />
+    <br />
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    <a asp-controller="Post" asp-action="Index" asp-route-SortBy="@Model.SortBy"
+                        asp-route-Author="@Model.Author" asp-route-Title="@Model.Title"
+                        asp-route-Page="@Model.Items.PageNumber.ToString()" asp-route-Topic="@Model.Topic">Sort</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        <span class="meta-data-text">Author: @Html.DisplayFor(modelItem => item.Author)</span>
+                        <span style="float:right; margin-top: 3px;" class="meta-data-text">Creation Date:
+                            @Html.DisplayFor(modelItem => item.CreationDate) Modified Date: @Html.DisplayFor(modelItem =>
+                        item.ModifiedDate) </span>
+                        <div class="image-div-container">
+                             <img style="max-height: 400px;" src="~/images/@item.ThumbnailImagePath" class="rounded img-fluid darken-image"
+                                alt="Responsive image">
+                             <div class="image-text-centered">@Html.DisplayFor(modelItem => item.Title)</div>
+                        </div>
+                        <div class="div-text-break lead mt-5">@Html.Raw(item.Content)</div> 
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <br />
     Page @(Model.Items.PageCount < Model.Items.PageNumber ? 0 : Model.Items.PageNumber) of @Model.Items.PageCount
-    @Html.PagedListPager(Model.Items, page => Url.Action("Index", new PostPageRequest(Model.Title, Model.Author, Model.Topic,page, Model.SortBy, true)), 
-    new PagedListRenderOptions {
+    @Html.PagedListPager(Model.Items, page => Url.Action("Index", new PostPageRequest(Model.Title, Model.Author,
+            Model.Topic, page, Model.SortBy, true)),
+            new PagedListRenderOptions
+    {
         LiElementClasses = new string[] { "page-item" },
-        PageClasses = new string[] { "page-link" } })
+        PageClasses = new string[] { "page-link" }
+    })
 </body>
+
 </html>

@@ -9,8 +9,8 @@ public interface IPostService  {
     Task<List<Post>> FindAllByUserName(string userName);
     Task<Post?> FindById(Guid? id);
     List<Topic> FindAllTopics();
-    Task CreatePost(Post post, List<CheckBox> topics);
+    Task CreatePost(Post post, PostCreateRequest postCreateRequest);
     List<CheckBox> ReturnRelatedTopics (Guid? id);
-    Task UpdatePost(List<CheckBox> topics, Guid postId);
+    Task UpdatePost(PostEditRequest postEditRequest);
     Task DeleteById(Guid postId);
 }
