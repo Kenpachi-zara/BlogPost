@@ -23,7 +23,7 @@ public class PostRepository : IPostRepository{
      private static IQueryable<Post> HandleFiltering(PostPageRequest pageRequest, IQueryable<Post> posts)
       {
        if (!string.IsNullOrEmpty(pageRequest.Title))
-          posts = posts.Where(s => s.Title.Contains(pageRequest.Title));   //more unrealistic warnings, all have non null constraint in DB
+          posts = posts.Where(s => s.Title.Contains(pageRequest.Title));
        if (!string.IsNullOrEmpty(pageRequest.Author))
             posts = posts.Where(s => s.Author.Equals(pageRequest.Author));
        if (!string.IsNullOrEmpty(pageRequest.Topic))
@@ -33,7 +33,7 @@ public class PostRepository : IPostRepository{
 
      private static IQueryable<Post> HandleSorting(PostPageRequest pageRequest, IQueryable<Post> posts)
       {
-            if (pageRequest.SortBy.Equals("date_desc")) // another invalid warning, this value already validated for nullability or empty
+            if (pageRequest.SortBy.Equals("date_desc"))
                 posts = posts.OrderByDescending(s => s.CreationDate);
             else
                 posts = posts.OrderBy(s => s.CreationDate);

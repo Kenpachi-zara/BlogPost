@@ -13,15 +13,13 @@ builder.Services.AddDbContext<BlogPostIdentityDbContext>(options =>
 builder.Services.AddDefaultIdentity<BlogPostUser>()  //options => options.SignIn.RequireConfirmedAccount = false  if true then requires email confirmation.
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BlogPostIdentityDbContext>(); 
-// Uses EF as database for identity, and configures required services.
+
 builder.Services.AddRazorPages(); 
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BlogPostConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationContext' not found.")));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -53,7 +51,7 @@ app.UseAuthorization();
 app.MapIdentityApi<BlogPostUser>();
 
 app.MapStaticAssets();
-app.MapControllerRoute(  //alawys need to add default, or return -> not found on all endpoint, check why
+app.MapControllerRoute(  
     name: "default",
     pattern: "{controller=Post}/{action=Index}")
     .WithStaticAssets();

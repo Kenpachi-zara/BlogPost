@@ -11,16 +11,18 @@ public class PostService(IPostRepository postRepository, ILogger<PostService> lo
 
     private const string FieldRequiredMessage = "This field is required";
     private const string TitleConstraint = "IX_Post_Title";
+    private const string DateDesc = "date_desc";
+    private const string DateAsc = "date_asc";
     private readonly IPostRepository _postRepository = postRepository;
     private readonly ILogger _logger = logger;
     private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
     public IQueryable<Post> FindAllByPageRequest(PostPageRequest pageRequest){
-            if (string.IsNullOrEmpty(pageRequest.SortBy)) pageRequest.SortBy = "date_desc";
-            if (!pageRequest.NextPage) pageRequest.SortBy = pageRequest.SortBy == "date_desc" ? "date_asc" : "date_desc";
+            if (string.IsNullOrEmpty(pageRequest.SortBy)) pageRequest.SortBy = DateDesc;
+            if (!pageRequest.NextPage) pageRequest.SortBy = pageRequest.SortBy == DateDesc ? DateAsc : DateDesc;
             var posts = _postRepository.FindAllByPredicate(pageRequest);
             return posts;
-        }
+    }
 
     public async Task<List<Post>> FindAllByUserName(string userName) => await _postRepository.FindAllByUserName(userName);
     public Task<Post?> FindById(Guid? id) => _postRepository.FindById(id);

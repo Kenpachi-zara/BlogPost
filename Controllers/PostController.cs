@@ -15,22 +15,16 @@ using BlogPost.Exceptions;
 namespace BlogPost.Controllers
 {
     [Authorize(Roles = "Post")]
-    public class PostController : Controller
+    public class PostController(IMapper mapper, IPostService postService, ILogger<PostController> logger) : Controller
     {
-        private readonly IMapper _mapper;
-        private readonly IPostService _postService;
-        private readonly ILogger _logger;
-
-        public PostController(IMapper mapper, IPostService postService, ILogger<PostController> logger)
-        {
-            _mapper = mapper;
-            _postService = postService;
-            _logger = logger;
-        }
+        private readonly IMapper _mapper = mapper;
+        private readonly IPostService _postService = postService;
+        private readonly ILogger _logger = logger;
 
         [AllowAnonymous]
         public IActionResult Index(PostPageRequest pageRequest)
         {
+            if (pageRequest is null) return BadRequest("Provide request data");
             IQueryable<Post>? posts = _postService.FindAllByPageRequest(pageRequest);
             PostIndexViewModel viewModel = MapViewModel(pageRequest, posts);
             return base.View(viewModel);
@@ -41,7 +35,6 @@ namespace BlogPost.Controllers
         {
             _logger.LogInformation("Fetching All Posts related to UserName at {DT}", DateTime.UtcNow.ToLongTimeString());
             var currentUserName = User.FindFirstValue(ClaimTypes.Name);
-            if (currentUserName == null) return BadRequest("Claims do not contain UserName");
             IEnumerable<Post> posts = await _postService.FindAllByUserName(currentUserName);
             return View( _mapper.Map<IEnumerable<PostViewDto>>(posts));
         }
@@ -68,12 +61,11 @@ namespace BlogPost.Controllers
         // POST: Post/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PostCreateRequest postCreateRequest, IFormFile? ImageFile)
+        public async Task<IActionResult> Create(PostCreateRequest postCreateRequest, IFormFile? imageFile)
         {
             _logger.LogInformation("Handle Request to create post {DT}", DateTime.UtcNow.ToLongTimeString());
-            if (postCreateRequest.Post is null) return BadRequest("Must set Post data in request");
-            Post post = MapPost(postCreateRequest);
-            postCreateRequest.Post.ImageFile = ImageFile;
+            if (IsRequestEmpty(postCreateRequest)) return BadRequest("Request Data not provided");
+            Post post = MapPost(postCreateRequest, imageFile);
             try
             {
                 await _postService.CreatePost(post, postCreateRequest); // unrealistic warning, validated for nullability
@@ -106,8 +98,8 @@ namespace BlogPost.Controllers
         public async Task<IActionResult> Edit([Bind] PostEditRequest postEditRequest, IFormFile? ImageFile)
         {
             _logger.LogInformation("Handling request to edit post {DT}", DateTime.UtcNow.ToLongTimeString());
-            if (postEditRequest.Post is null) return BadRequest("Must set Post data in request");
-            postEditRequest.Post.ImageFile = ImageFile;
+            if (IsEditRequestEmpty(postEditRequest)) return BadRequest("Must set Post data in request");
+             postEditRequest.Post.ImageFile = ImageFile;
             try
             {
                 await _postService.UpdatePost(postEditRequest);
@@ -145,10 +137,11 @@ namespace BlogPost.Controllers
             return RedirectToAction(nameof(Related));
         }
 
-        private Post MapPost(PostCreateRequest postCreateRequest)
+        private Post MapPost(PostCreateRequest postCreateRequest, IFormFile? imageFile)
         {
             Post post = _mapper.Map<Post>(postCreateRequest.Post);
             post.Author = User.FindFirstValue(ClaimTypes.Name);
+            postCreateRequest.Post.ImageFile = imageFile;
             return post;
         }
 
@@ -160,5 +153,8 @@ namespace BlogPost.Controllers
             viewModel.Items = items;
             return viewModel;
         }
+
+       private static bool IsEditRequestEmpty(PostEditRequest postEditRequest) => postEditRequest  is null || postEditRequest.Post is null;
+       private static bool IsRequestEmpty(PostCreateRequest postCreateRequest) => postCreateRequest is null || postCreateRequest.Post is null;
     }
 }

@@ -14,14 +14,14 @@
     <div class="col-md-4">
         <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group  my-2">
                 <label asp-for="Post.Title" class="control-label"></label>
                 <input asp-for="Post.Title" class="form-control" />
                 <span asp-validation-for="Post.Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group  my-2">
                 <label asp-for="Post.Content" class="control-label"></label>
-                <input asp-for="Post.Content" class="form-control" />
+                <textarea asp-for="Post.Content" class="form-control" rows="15"></textarea>
                 <span asp-validation-for="Post.Content" class="text-danger"></span>
             </div>
             <div class="form-group my-3">
@@ -32,7 +32,7 @@
                 <table>
                     <thead>
                     <tr>
-                     <th>Name</th>
+                     <th>Assign Topics</th>
                    </tr>
                     </thead>
                     <tbody>
@@ -52,14 +52,12 @@
                     </tbody>
                 </table>
             </div>
-            <div class="form-group">
+            <div class="form-group my-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Related">Back to List</a>
             </div>
         </form>
     </div>
-</div>
-<div>
-    <a asp-action="Related">Back to List</a>
 </div>
 </body>
 </html>
